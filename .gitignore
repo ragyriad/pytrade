@@ -1,7 +1,8 @@
 frontend/node_modules/
 api/questrade_info/
+**/__pycache__/
 # Byte-compiled / optimized / DLL files
-__pycache__/
+
 *.py[cod]
 *$py.class
 
