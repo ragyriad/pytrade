@@ -18,10 +18,10 @@ class Activity (models.Model):
     netAmount = models.DecimalField(default=0,max_digits=10, decimal_places=2)
     commission = models.DecimalField(default=0,max_digits=10, decimal_places=2)
 
-    tradeDate = models.DateTimeField(null=True, blank=True)
-    settlementDate = models.DateTimeField(null=True, blank=True)
-    createdAt = models.DateTimeField(null=True, blank=True, auto_now_add = True)
-    lastModified= models.DateTimeField(null=True, blank=True, auto_now_add = True)
+    tradeDate = models.DateTimeField(blank=True)
+    settlementDate = models.DateTimeField(blank=True)
+    createdAt = models.DateTimeField(auto_now_add = True)
+    lastModified= models.DateTimeField(auto_now_add = True)
 
 
 
