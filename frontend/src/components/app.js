@@ -1,18 +1,14 @@
-import Header from './Header';
 import Account from './Account';
 import ActivityPage from './ActivityPage';
-
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
+import OverviewPage from './OverviewPage';
 import PropTypes from 'prop-types';
 
 import { createRoot } from 'react-dom/client';
 import React, { useState } from "react";
 import { Provider } from 'react-redux'
 import store from '../Redux/store'
-import OverviewPage from './OverviewPage';
+
+import { AppBar, Toolbar, Typography, Tabs, Tab, Box } from '@mui/material';
 
 const App = () => {
     const tabs = ['overview', 'activities', 'positions', 'options']
@@ -33,32 +29,38 @@ const App = () => {
     <Provider store={store}>
         <React.Fragment>
             <div>
-                <Header />
-                    <Box sx={{ width: '100%' }}>
-                        <Box sx={{  }}> 
-                            <Tabs onChange={handleTabChange} value={tab} >
-                                <Tab  label="Overview"  {...a11yProps(0)} />
-                                <Tab  label="Activities"  {...a11yProps(1)} />
-                                <Tab  label="Options"  {...a11yProps(2)}/>
-                                <Tab  label="Positions"  {...a11yProps(3)} />
-                            </Tabs>
+
+                <AppBar sx={{ bgcolor: "#2E3B55" }} position='sticky'>
+                    <Toolbar>
+                        <Box sx={{ width: '100%' }}>
+                            <Box sx={{  }}> 
+                                <Tabs textColor="white" onChange={handleTabChange} value={tab} centered >
+                                    <Tab  label="Overview"  {...a11yProps(0)} />
+                                    <Tab  label="Activities"  {...a11yProps(1)} />
+                                    <Tab  label="Options"  {...a11yProps(2)}/>
+                                    <Tab  label="Positions"  {...a11yProps(3)} />
+                                </Tabs>
+                            </Box>
                         </Box>
-                    </Box>
-                    <CustomTabPanel value={tab} index={0}>
-                        
-                        <OverviewPage />
-                    </CustomTabPanel>
-                    <CustomTabPanel value={tab} index={1}>
-                        <Account />
-                        <ActivityPage />
-                    </CustomTabPanel>
-                    <CustomTabPanel value={tab} index={2}>
-                        Item Three
-                    </CustomTabPanel>
-                    <CustomTabPanel value={tab} index={3}>
-                        Positions
-                    </CustomTabPanel>
-                
+                        <Typography variant='h5' component="div">
+                            PyTrade
+                        </Typography>
+                    </Toolbar>
+                    
+                </AppBar>
+                <CustomTabPanel value={tab} index={0}>
+                    <OverviewPage />
+                </CustomTabPanel>
+                <CustomTabPanel value={tab} index={1}>
+                    <Account />
+                    <ActivityPage />
+                </CustomTabPanel>
+                <CustomTabPanel value={tab} index={2}>
+                    Item Three
+                </CustomTabPanel>
+                <CustomTabPanel value={tab} index={3}>
+                    Positions
+                </CustomTabPanel>
             </div>
         </React.Fragment>
     </Provider>
