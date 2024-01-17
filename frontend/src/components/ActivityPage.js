@@ -1,72 +1,87 @@
 import React, { useEffect,useState } from "react";
-import { useSelector } from 'react-redux'
+import { useSelector } from 'react-redux';
+
+import { DataGrid } from '@mui/x-data-grid';
+import { Box, Paper } from "@mui/material";
+
     
-    
-const ActivityPage = (accountNumberFilter) => {
+const ActivityPage = () => {
 
     const [activities, setActivities] = useState([])
-    const state = useSelector((state) => state)
-    console.log(state)
-    const isCommission = useSelector((state) => state.commissionFilter.value)
+    console.log("STATE")
+    console.log(useSelector((state) => state))
+    const isCommission = useSelector((state) => state.commission.value)
+    const isDeposit = useSelector((state) => state.deposits.value)
+    const isTrades = useSelector((state) => state.trades.value)
     const accountFilter = useSelector((state) => state.accountFilter.value)
     let fetchUrl = 'http://localhost:8000/api/activity';
     let commissionUrl = 'http://localhost:8000/api/account/commission';
-    if (accountFilter != 0 && (isCommission == false)) {
+
+    const columns = [
+        { field: 'symbol', headerName: 'Symbol', width: 70 },
+        { field: 'currency', headerName: 'Currency', width: 130 },
+        { field: 'price', headerName: 'Price', width: 130 },
+        { field: 'type', headerName: 'Type', width: 130 },
+        { field: 'quantity', headerName: 'Quantity', width: 130 },
+        { field: 'commission', headerName: 'Commission', width: 130 },
+        { field: 'netAmount', headerName: 'Net Amount', width: 130 },
+        { field: 'grossAmount', headerName: 'Gross Amount', width: 130 }
+      ];
+
+    if (accountFilter.length > 0 && (isCommission == false)) {
 
         fetchUrl = fetchUrl + '?accountNumber=' + accountFilter
     }
         
-    else if(isCommission)
-        fetchUrl = commissionUrl
 
+    const setFetchURl = (url, params) => {
+
+    }
     useEffect (() => {
         fetch(fetchUrl)
         .then((res) => {
             return res.json();
         })
         .then((data) => {
-            console.log(data);
             setActivities(data.activities);
         })
-    }, [accountNumberFilter, isCommission, accountFilter])
-
+    }, [isCommission, accountFilter])
+    
+    const getRowsData  = () => {
+  
+        const rows = activities.map((activity, indx) => {
+            return {
+                "id": indx,
+                "symbol" : activity.fields.symbol,
+                "currency" : activity.fields.currency,
+                "price" : activity.fields.price,
+                "type" : activity.fields.type,
+                "quantity" : activity.fields.quantity,
+                "commission" : activity.fields.commission,
+                "netAmount" : activity.fields.netAmount,
+                "grossAmount" : activity.fields.grossAmount
+            }
+        })
+        return rows;
+    }
     return (
-        <div style={{
-            display: "flex",
-            justifyContent: "center"
-        }}>
-            <table>
-                <thead>
-                    <tr>
-                        <th>symbol</th>
-                        <th>currency</th>
-                        <th>price</th>
-                        <th>type</th>
-                        <th>quantity</th>
-                        <th>comission</th>
-                        <th>net Amount</th>
-                        <th>Gross Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-            {activities.map((activity) => {
-                return (
-                    <tr>
-                        <td>{activity.fields.symbol}</td>
-                        <td>{activity.fields.currency}</td>
-                        <td>{activity.fields.price}</td>
-                        <td>{activity.fields.type}</td>
-                        <td>{activity.fields.quantity}</td>
-                        <td>{activity.fields.commission}</td>
-                        <td>{activity.fields.netAmount}</td>
-                        <td>{activity.fields.grossAmount}</td>
-                    </tr>
-                )
-            })}
-                </tbody>
-            </table>
-        </div>
-        
+        <Box style={{  marginTop: 20, height: 400, width: '100%' }}>
+            <Paper>
+                <DataGrid
+                rowSelection={false}
+                rows={getRowsData()}
+                columns={columns}
+                initialState={{
+                pagination: {
+                    paginationModel: { page: 0, pageSize: 10 },
+                },
+                }}
+                pageSizeOptions={[10, 20]}
+                checkboxSelection
+                />
+            </Paper>
+            
+        </Box>
     )
 }
 

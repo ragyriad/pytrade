@@ -9,6 +9,7 @@ urlpatterns = [
     path('/account/get_all', getAccount.as_view()),
     path('/account/delete_all', deleteAccount.as_view()),
     path('/overview/commission', getAccountCommissions.as_view()),
+    path('/account/commission', getAccountCommissions.as_view()),
     path('/overview/dividends', getAccountDividends.as_view()),
     path('/overview/trades', getAccountTradesCount.as_view()),
     path('/activity', getActivity.as_view()),

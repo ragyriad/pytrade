@@ -15,7 +15,7 @@ class getAccountCommissions (APIView):
         serializedActivities= json.loads(serialize("json",Activity.objects.filter(commission__lt=0)))
         commissionList = list(map(lambda n : abs(float(n["fields"]["commission"])), serializedActivities))
         totalCommissionAmount = round(reduce(lambda x, y: y + x, commissionList),2)
-        return Response({'totalAmount': totalCommissionAmount}, status=status.HTTP_200_OK) 
+        return Response({'totalAmount': totalCommissionAmount,'activities': serializedActivities}, status=status.HTTP_200_OK) 
     
 
 class getAccountDividends (APIView):
