@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import JsonResponse
 import requests 
+from django.db.models import Q
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -38,14 +39,31 @@ class deleteAccount(APIView):
 class getActivity(APIView):
     serializer_class = getActivitySerializers
     def get(self,request):
-        requestAccountNumber = request.GET.get('accountNumber')
+
         allActivities = []
-        if requestAccountNumber!= None:
-            allActivities = Activity.objects.filter(accountNumber=int(requestAccountNumber))
-        else:
-            allActivities =  Activity.objects.all()
+        requestParams = dict(request.GET)
+        requestKeys = list(requestParams.keys())
+        doesItHaveAccount = "account" in requestKeys
+        doesItHaveActivity = "activityType" in requestKeys
+        doesItHaveCommission = "commissionFilter" in requestKeys
+        query = Q()
+        
+        if doesItHaveAccount:
+            accountsParameter = [int(val) for val in requestParams.get("account")[0].split(",")]
+            if len(accountsParameter) > 0: 
+                query = Q(accountNumber__in=accountsParameter)
+        if doesItHaveActivity:
+            activityTypeParameter = requestParams.get("activityType")[0].split(",")
+            if len(activityTypeParameter) > 0: 
+                query &= Q(type__in=activityTypeParameter)
+                if "Commission" in activityTypeParameter:
+                    query &= Q(commission__lt=0)
+
+        print(query)
+        allActivities =  Activity.objects.filter(query)
         serializedActivities= json.loads(serialize("json",allActivities))
         count = len(allActivities)
+        print(count)
         return Response({'count': count,'activities': serializedActivities}, status=status.HTTP_200_OK)
     
 class deleteActivity(APIView):
