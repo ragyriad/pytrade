@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-
+import moment from "moment";
 import { DataGrid } from "@mui/x-data-grid";
 import { Box, Paper } from "@mui/material";
-
 import Filters from "./Filters";
 
 const ActivityPage = () => {
@@ -17,22 +16,24 @@ const ActivityPage = () => {
   );
 
   let fetchUrl = new URL("http://localhost:8000/api/activity");
+
   const activityTypes = [
     { label: "Trades" },
     { label: "Dividends" },
     { label: "Deposits" },
+    { label: "FX conversion" },
   ];
-  const isCommission = false;
-
+  console.log(activities);
   const columns = [
-    { field: "symbol", headerName: "Symbol", width: 70 },
-    { field: "currency", headerName: "Currency", width: 130 },
-    { field: "price", headerName: "Price", width: 130 },
-    { field: "type", headerName: "Type", width: 130 },
-    { field: "quantity", headerName: "Quantity", width: 130 },
-    { field: "commission", headerName: "Commission", width: 130 },
-    { field: "netAmount", headerName: "Net Amount", width: 130 },
-    { field: "grossAmount", headerName: "Gross Amount", width: 130 },
+    { field: "accountNumber", headerName: "Acc Number", minWidth: 100 },
+    { field: "symbol", headerName: "Symbol", minWidth: 70 },
+    { field: "currency", headerName: "Currency", minWidth: 50 },
+    { field: "price", headerName: "Price", minWidth: 70 },
+    { field: "type", headerName: "Type", minWidth: 90 },
+    { field: "quantity", headerName: "Quantity", minWidth: 50 },
+    { field: "commission", headerName: "Commission", minWidth: 70 },
+    { field: "netAmount", headerName: "Net Amount", minWidth: 100 },
+    { field: "tradeDate", headerName: "Trade Date", minWidth: 150, flex: 3 },
   ];
 
   const setFetchURl = () => {
@@ -40,7 +41,6 @@ const ActivityPage = () => {
       fetchUrl.searchParams.append("account", accountFilterState);
     if (activityTypeFilterState.length > 0)
       fetchUrl.searchParams.append("activityType", activityTypeFilterState);
-    console.log(fetchUrl.href);
     return fetchUrl;
   };
 
@@ -59,6 +59,7 @@ const ActivityPage = () => {
     const rows = activities.map((activity, indx) => {
       return {
         id: indx,
+        accountNumber: activity.fields.accountNumber,
         symbol: activity.fields.symbol,
         currency: activity.fields.currency,
         price: activity.fields.price,
@@ -67,6 +68,7 @@ const ActivityPage = () => {
         commission: activity.fields.commission,
         netAmount: activity.fields.netAmount,
         grossAmount: activity.fields.grossAmount,
+        tradeDate: moment(activity.fields.tradeDate).format("DD/MM/YYYY"),
       };
     });
     return rows;

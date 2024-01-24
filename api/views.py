@@ -20,32 +20,31 @@ base_path = Path(__file__).parent
 file_path = (base_path / "questrade_info/info.yaml").resolve()
 
 
-def main (request):
-    return HttpResponse("Hello")
 
-class getAccount(APIView):
+
+class accountApiView(APIView):
     serializer_class = getActivitySerializers
+
     def get(self,request):
         fetchedAccounts = Account.objects.all()
         serializedAccounts= json.loads(serialize("json",fetchedAccounts))
         count = len(serializedAccounts)
         return Response({'count': count,'accounts': serializedAccounts}, status=status.HTTP_200_OK)
-
-class deleteAccount(APIView):
-    def delete (self,request):
-        records = Account.objects.all()
-        return Response(Account.objects.all().delete(), status=status.HTTP_200_OK)
     
-class getActivity(APIView):
-    serializer_class = getActivitySerializers
-    def get(self,request):
+    def delete(self,request):
+        records = Account.objects.all()
+        serializedAccounts= json.loads(serialize("json",records))
+        return Response({"action" : "ToDelete", "data": serializedAccounts  }, status=status.HTTP_200_OK)
 
+class activityApiView(APIView):
+    serializer_class = getActivitySerializers
+
+    def get(self,request):
         allActivities = []
         requestParams = dict(request.GET)
         requestKeys = list(requestParams.keys())
         doesItHaveAccount = "account" in requestKeys
         doesItHaveActivity = "activityType" in requestKeys
-        doesItHaveCommission = "commissionFilter" in requestKeys
         query = Q()
         
         if doesItHaveAccount:
@@ -54,10 +53,9 @@ class getActivity(APIView):
                 query = Q(accountNumber__in=accountsParameter)
         if doesItHaveActivity:
             activityTypeParameter = requestParams.get("activityType")[0].split(",")
+            print(activityTypeParameter)
             if len(activityTypeParameter) > 0: 
                 query &= Q(type__in=activityTypeParameter)
-                if "Commission" in activityTypeParameter:
-                    query &= Q(commission__lt=0)
 
         print(query)
         allActivities =  Activity.objects.filter(query)
@@ -66,9 +64,11 @@ class getActivity(APIView):
         print(count)
         return Response({'count': count,'activities': serializedActivities}, status=status.HTTP_200_OK)
     
-class deleteActivity(APIView):
+    ## Method should delete the data however there is no longer access to this data 
+    ## and it needs to be preserved. The method was previously used is preserved to maintain design
     def delete (self,request):
-        deleteAction = Activity.objects.all().delete()
-        return Response(deleteAction, status=status.HTTP_200_OK)
+        activitiesToDelete = Activity.objects.all()
+        serializedActivities= json.loads(serialize("json",activitiesToDelete))
+        return Response({"action": "toDelete", "data": serializedActivities}, status=status.HTTP_200_OK)
 
      
