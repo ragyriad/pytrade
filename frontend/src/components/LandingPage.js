@@ -15,9 +15,8 @@ const LandingPage = () => {
   const [acc, setAcc] = useState([]);
   const tab = useSelector((state) => state.tab.value);
 
-  dispatch(setAccounts(acc));
   useEffect(() => {
-    fetch("http://localhost:8000/api/account/get_all")
+    fetch("http://localhost:8000/api/account")
       .then((res) => {
         return res.json();
       })
@@ -25,11 +24,11 @@ const LandingPage = () => {
         const accountData = data.accounts.map((account) => {
           return {
             label: account.fields.type,
-            accountNumber: account.fields.accountNumber,
+            accountNumber: account.pk,
           };
         });
-        console.log("accountData");
-        setAcc(accountData);
+        dispatch(setAccounts(accountData));
+        //setAcc(accountData);
       });
   }, []);
 

@@ -23,8 +23,7 @@ const Filters = ({ activityTypes }) => {
         .map((account) => account.accountNumber)[0];
       selectedAccountNumbers.push(accountNumber);
     });
-    console.log("selectedAccountNumbers");
-    console.log(selectedAccountNumbers);
+
     dispatch(setAccountFilter(selectedAccountNumbers));
     dispatch(setActivityTypeFilter(selectedActivityTypes));
   };
@@ -61,7 +60,7 @@ const Filters = ({ activityTypes }) => {
               <div></div>
             )}
           </Grid>
-          <Grid display="flex" alignItems="center" spacing={2} item>
+          <Grid display="flex" alignItems="center" item>
             <Button
               variant="contained"
               size="medium"

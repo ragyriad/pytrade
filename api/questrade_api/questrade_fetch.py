@@ -1,21 +1,23 @@
 import yaml
-from django.shortcuts import render
-from django.http import HttpResponse
-from django.http import JsonResponse
-import requests 
-from rest_framework import generics, status
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from django.core.serializers import serialize
-
-from ..serializers import getActivitySerializers, updateActivitySerializers, updateAccountsSerializers
-from ..models import Activity, Account
-
 from pathlib import Path
 import calendar, datetime,time
 from datetime import timezone
 import json
+from requests.exceptions import HTTPError
 from questrade_api import Questrade
+from ..models import Activity, Account
+
+from django.core.serializers import serialize
+from django.http import HttpResponse
+from django.http import JsonResponse
+
+from rest_framework import generics, status
+
+
+
+
+
+
 
 base_path = Path(__file__).parent
 file_path = (base_path / "questrade_info/info.yaml").resolve()
@@ -35,10 +37,17 @@ def writeFile(newFileContent):
     return None
 
 def authentication():
-    
+    print("Authenticating Questrade")
     fileContent = openFile()
-    questObject= Questrade(refresh_token=fileContent['refresh_token'])
-
+    questObject = Questrade()
+    
+    try:
+        questObject= Questrade(refresh_token=fileContent['refresh_token'])
+    except Exception as e:
+        print("Response")
+        print(e)
+        print("Most likely you will need a new refresh token")
+    
     modifiedQuestradeInfo = fileContent
     modifiedQuestradeInfo['refresh_token'] = questObject.auth.token['refresh_token']
     modifiedQuestradeInfo['access_token'] = questObject.auth.token['access_token']
@@ -47,22 +56,21 @@ def authentication():
     return questObject
 
 
-class fetchQestradeAccounts(APIView):
-    serializer_class = updateAccountsSerializers
-    def get(self, request):
-        questradeObject = authentication()
+def fetchQestradeAccounts(request):
+    questradeObject = authentication()
+    try:
         accounts = questradeObject.accounts
-        accounts = accounts['accounts']
-        
-        for account in accounts:
-            accounToBeSaved = Account(type=account['type'],accountNumber=account['number'],)
-            accounToBeSaved.save()
-        fetchedAccounts = json.loads(serialize("json",Account.objects.all()))
-        return Response({"count": len(fetchedAccounts), "accounts": fetchedAccounts}, status=status.HTTP_200_OK)
+    except Exception as e:
+        print (e)
+    accounts = accounts['accounts']
+    return JsonResponse({"count": len(accounts), "accounts": accounts}, status=status.HTTP_200_OK)
+    #for account in accounts:
+    #    accounToBeSaved = Account(type=account['type'],accountNumber=account['number'],)
+    #    accounToBeSaved.save()
+    #fetchedAccounts = json.loads(serialize("json",Account.objects.all()))
+    #return Response({"count": len(fetchedAccounts), "accounts": fetchedAccounts}, status=status.HTTP_200_OK)
     
-class   fetchQuestradeActivities (APIView):
-    serializer_class = updateActivitySerializers
-    def get(self, request):
+def fetchQuestradeActivities (request):
         questradeObject = authentication()
         fetchedAccounts = json.loads(serialize("json",Account.objects.all()))
         all_activities = []
@@ -80,23 +88,12 @@ class   fetchQuestradeActivities (APIView):
                     print(queryEndTime)
                     response = questradeObject.account_activities(accountNumber,startTime=queryStartTime,endTime=queryEndTime)
                     activities = response['activities']
-                    print(activities[0])
-                    print(len(activities))
                     if (len(activities) > 0):
                         for activity in activities:
                             newActivity = {'tradeDate' : activity['tradeDate'],'settlementDate':activity['settlementDate'],
                                     'currency':activity['currency'], 'quantity':activity['quantity'],"commission":activity['commission'],'type':activity['type'],
                                     'netAmount':activity['netAmount'],'grossAmount':activity['grossAmount'],'symbol':activity['symbol'], 'price':activity['price'],
                                     'symbolId':activity['symbolId'],'accountNumber':accountNumber}
-                            
-                            activityToSave = Activity(tradeDate=activity['tradeDate'],settlementDate=activity['settlementDate'],
-                                    currency=activity['currency'], quantity=activity['quantity'],commission=activity['commission'],type=activity['type'],
-                                    netAmount=activity['netAmount'],grossAmount=activity['grossAmount'],symbol=activity['symbol'], price=activity['price'],
-                                    symbolId=activity['symbolId'],accountNumber=accountNumber)
-                            activityToSave.save()
                             all_activities.append(newActivity)
-                                
-        print("TOTAL ACTIVITIES")
-        print(len(all_activities))
-        #activitiesObj = Activity.objects.bulk_create(updateActivitySerializers(all_activities), batch_size=(len(all_activities)/2))
-        return Response(all_activities, status=status.HTTP_200_OK)
+        print(all_activities)
+        return JsonResponse(all_activities, status=status.HTTP_200_OK)

@@ -1,5 +1,5 @@
 frontend/node_modules/
-api/questrade_info/
+api/questrade_api/questrade_info/
 api/migrations/
 frontend/migrations/
 **/__pycache__/
