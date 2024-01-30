@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-g^r62y*&^2*@&o5ajc+^nbo8r8@gvr*o84@hl=dg!^im_qt#sq
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost','127.0.0.1', '172.31.28.22','pytrade-py.eba-s3ehqpju.eu-west-1.elasticbeanstalk.com','pytrade-2.eu-west-1.elasticbeanstalk.com']
 
 
 # Application definition

@@ -12,11 +12,10 @@ import { AppBar, Toolbar, Typography, Tabs, Tab, Box } from "@mui/material";
 
 const LandingPage = () => {
   const dispatch = useDispatch();
-  const [acc, setAcc] = useState([]);
   const tab = useSelector((state) => state.tab.value);
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/account")
+    fetch("api/account")
       .then((res) => {
         return res.json();
       })
@@ -28,7 +27,6 @@ const LandingPage = () => {
           };
         });
         dispatch(setAccounts(accountData));
-        //setAcc(accountData);
       });
   }, []);
 

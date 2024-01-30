@@ -33,7 +33,7 @@ const ActivityPage = () => {
     { field: "quantity", headerName: "Quantity", minWidth: 50 },
     { field: "commission", headerName: "Commission", minWidth: 70 },
     { field: "netAmount", headerName: "Net Amount", minWidth: 100 },
-    { field: "tradeDate", headerName: "Trade Date", minWidth: 150, flex: 3 },
+    { field: "tradeDate", headerName: "Trade Date", minWidth: 150, flex: 1 },
   ];
 
   const setFetchURl = () => {

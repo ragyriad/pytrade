@@ -38,8 +38,7 @@ def getAccountDividends (request):
     return JsonResponse({'totalAmount': totalDividendAmount}, status=status.HTTP_200_OK)  
     
 def getAccountTradesCount (request):
-    
     accountActivities= json.loads(serialize("json",Activity.objects.filter(type="Trades")))
     resultsLength = len(accountActivities)
     print(resultsLength)
-    return JsonResponse({'tradesCount': resultsLength}, status=status.HTTP_200_OK) 
+    return JsonResponse({'tradesCount': len(accountActivities)}, status=status.HTTP_200_OK) 

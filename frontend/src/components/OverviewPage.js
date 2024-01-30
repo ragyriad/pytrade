@@ -13,9 +13,9 @@ const OverviewPage = () => {
   const accountFilter = useSelector((state) => state.accountFilter.value);
   useEffect(() => {
     Promise.all([
-      fetch("http://localhost:8000/api/overview/commission"),
-      fetch("http://localhost:8000/api/overview/dividends"),
-      fetch("http://localhost:8000/api/overview/trades"),
+      fetch("api/overview/commission"),
+      fetch("api/overview/dividends"),
+      fetch("api/overview/trades"),
     ])
       .then(async ([comission, dividends, trades]) => {
         const commissionData = await comission.json();
