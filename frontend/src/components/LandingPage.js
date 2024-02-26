@@ -20,10 +20,12 @@ const LandingPage = () => {
         return res.json();
       })
       .then((data) => {
+        console.log("ACCOUNTS!");
+        console.log(data);
         const accountData = data.accounts.map((account) => {
           return {
-            label: account.fields.type,
-            accountNumber: account.pk,
+            label: account.type,
+            account_number: account.account_number,
           };
         });
         dispatch(setAccounts(accountData));

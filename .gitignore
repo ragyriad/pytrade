@@ -1,10 +1,12 @@
+
+
 frontend/node_modules/
-api/questrade_api/questrade_info/
+api/brokers/info/
 api/migrations/
 frontend/migrations/
 **/__pycache__/
 __pycache__/
-
+db.sqlite3
 # Byte-compiled / optimized / DLL files
 
 *.py[cod]

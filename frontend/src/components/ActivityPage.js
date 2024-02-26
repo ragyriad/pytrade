@@ -23,9 +23,8 @@ const ActivityPage = () => {
     { label: "Deposits" },
     { label: "FX conversion" },
   ];
-  console.log(activities);
   const columns = [
-    { field: "accountNumber", headerName: "Acc Number", minWidth: 100 },
+    { field: "account_number", headerName: "Acc Number", minWidth: 100 },
     { field: "symbol", headerName: "Symbol", minWidth: 70 },
     { field: "currency", headerName: "Currency", minWidth: 50 },
     { field: "price", headerName: "Price", minWidth: 70 },
@@ -59,7 +58,7 @@ const ActivityPage = () => {
     const rows = activities.map((activity, indx) => {
       return {
         id: indx,
-        accountNumber: activity.fields.accountNumber,
+        account_number: activity.fields.account_number,
         symbol: activity.fields.symbol,
         currency: activity.fields.currency,
         price: activity.fields.price,

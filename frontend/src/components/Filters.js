@@ -20,7 +20,7 @@ const Filters = ({ activityTypes }) => {
     selectedAccounts.forEach((selectedAccount) => {
       const accountNumber = storeAccounts
         .filter((storeAccount) => storeAccount.label === selectedAccount)
-        .map((account) => account.accountNumber)[0];
+        .map((account) => account.account_number)[0];
       selectedAccountNumbers.push(accountNumber);
     });
 

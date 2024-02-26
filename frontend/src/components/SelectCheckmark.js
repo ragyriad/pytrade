@@ -23,11 +23,10 @@ const MultipleSelectCheckmarks = ({ data, selectedFilters, setter, label }) => {
     let {
       target: { value },
     } = event;
-    if (data[0].accountNumber) {
+    if (data[0].account_number) {
       const accountNumber = data.reduce((entry) =>
-        entry.label == value ? entry.accountNumber : ""
+        entry.label == value ? entry.account_number : ""
       );
-      //value = accountNumber;
     }
     const val = setter(
       // On autofill we get a stringified value.
@@ -54,7 +53,7 @@ const MultipleSelectCheckmarks = ({ data, selectedFilters, setter, label }) => {
               <MenuItem
                 key={obj.label + obj.accountNumber}
                 value={obj.label}
-                accountnumber={obj.accountNumber ? obj.accountNumber : ""}
+                accountnumber={obj.account_number ? obj.account_number : ""}
               >
                 <Checkbox checked={selectedFilters.indexOf(obj.label) > -1} />
                 <ListItemText primary={obj.label} />
