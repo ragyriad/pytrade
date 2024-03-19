@@ -6,7 +6,10 @@ api/migrations/
 frontend/migrations/
 **/__pycache__/
 __pycache__/
+jsonData/
 db.sqlite3
+/*.sqbpro
+/scripts/*
 # Byte-compiled / optimized / DLL files
 
 *.py[cod]

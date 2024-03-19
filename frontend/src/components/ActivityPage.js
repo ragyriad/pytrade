@@ -9,7 +9,7 @@ const ActivityPage = () => {
   console.log("STATE");
   console.log(useSelector((state) => state));
   const [activities, setActivities] = useState([]);
-
+  console.log(activities);
   const accountFilterState = useSelector((state) => state.accountFilter.value);
   const activityTypeFilterState = useSelector(
     (state) => state.activityTypeFilters.value
@@ -58,16 +58,16 @@ const ActivityPage = () => {
     const rows = activities.map((activity, indx) => {
       return {
         id: indx,
-        account_number: activity.fields.account_number,
-        symbol: activity.fields.symbol,
-        currency: activity.fields.currency,
-        price: activity.fields.price,
-        type: activity.fields.type,
-        quantity: activity.fields.quantity,
-        commission: activity.fields.commission,
-        netAmount: activity.fields.netAmount,
-        grossAmount: activity.fields.grossAmount,
-        tradeDate: moment(activity.fields.tradeDate).format("DD/MM/YYYY"),
+        account_number: activity.account_number,
+        symbol: activity.symbol,
+        currency: activity.currency,
+        price: activity.price,
+        type: activity.type,
+        quantity: activity.quantity,
+        commission: activity.commission,
+        netAmount: activity.net_amount,
+        grossAmount: activity.gross_amount,
+        tradeDate: moment(activity.trade_date).format("DD/MM/YYYY"),
       };
     });
     return rows;
