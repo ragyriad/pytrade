@@ -1,8 +1,8 @@
 from .requestor import APIRequestor
 import cloudscraper
-import os
 import json
-from typing import Callable, Optional, Union
+from typing import Optional, Union
+from requests.exceptions import HTTPError
 
 class wealthSimple:
     """
@@ -49,7 +49,7 @@ class wealthSimple:
         Get foreign exchange rate
     """
 
-    def __init__(self, email: str, password: str, two_factor_callback: callable = None):
+    def __init__(self, email: str, password: str, refresh_token: str = None, mfa_code: str = None, two_factor_callback: callable = None):
         """
         Parameters
         ----------
@@ -61,16 +61,73 @@ class wealthSimple:
             Callback function that returns user input for 2FA code
         """
         self.session = cloudscraper.create_scraper()
+        self.session.headers["Authorization"] = refresh_token
         self.APIMAIN = "https://trade-service.wealthsimple.com/"
         self.TradeAPI = APIRequestor(self.session, self.APIMAIN)
-        self.login(email, password, two_factor_callback=two_factor_callback)
+        if not refresh_token:
+            self.login(email, password, mfa_code, two_factor_callback=two_factor_callback)
 
     def login(
         self,
         email: str = None,
         password: str = None,
+        mfa_code: str = None,
         two_factor_callback: callable = None,
     ) -> None:
+        # """Login to Wealthsimple Trade account
+
+        # Parameters
+        # ----------
+        # email : str
+        #     Wealthsimple Trade account email
+        # password : str
+        #     Wealthsimple Trade account password
+        # two_factor_callback: function
+        #     Callback function that returns user input for 2FA code
+
+        # Returns
+        # -------
+        # None
+        # """
+        # if email and password:
+
+        #     # Login credentials to pass in request
+        #     data = [
+        #         ("email", email),
+        #         ("password", password),
+        #     ]
+
+        #     response = self.TradeAPI.makeRequest("POST", "auth/login", data)
+        #     # Check if account requires 2FA
+        #     if "x-wealthsimple-otp" in response.headers:
+        #         if mfa_code == None and  two_factor_callback == None:
+        #             raise Exception(
+        #                 "This account requires 2FA. A 2FA callback function or MFA Code must be provided"
+        #             )
+        #         else:
+        #             otp_value = None
+        #             if mfa_code:
+        #                 otp_value = mfa_code
+        #             elif hasattr(two_factor_callback, '__call__') and mfa_code == None:
+        #                 # Obtain 2FA code using callback function
+        #                 otp_value = two_factor_callback()
+        #                 # Add the 2FA code to the body of the login request
+        #             else:
+        #                 otp_value = two_factor_callback()
+        #             data.append(("otp", otp_value))
+        #             # Make a second login request using the 2FA code
+        #             response = self.TradeAPI.makeRequest(
+        #                 "POST", "auth/login", data)
+
+        #     if response.status_code == 401:
+        #         raise Exception("Invalid Login")
+
+        #     # Update session headers with the API access token
+        #     self.session.headers.update(
+        #         {"Authorization": response.headers["X-Access-Token"]}
+        #     )
+        # else:
+        #     raise Exception("Missing login credentials")
         """Login to Wealthsimple Trade account
 
         Parameters
@@ -79,47 +136,59 @@ class wealthSimple:
             Wealthsimple Trade account email
         password : str
             Wealthsimple Trade account password
-        two_factor_callback: function
+        two_factor_callback: callable
             Callback function that returns user input for 2FA code
 
         Returns
         -------
-        None
+        dict
+            A dictionary containing the status of the login attempt and any error messages
         """
-        if email and password:
+        if not email or not password:
+            return {"status": 400, "error": "Missing login credentials"}
 
-            # Login credentials to pass in request
-            data = [
-                ("email", email),
-                ("password", password),
-            ]
+        # Login credentials to pass in request
+        data = [("email", email), ("password", password)]
 
+        try:
+            # Initial login request
             response = self.TradeAPI.makeRequest("POST", "auth/login", data)
 
-            # Check if account requires 2FA
+            # Handle potential MFA requirement
             if "x-wealthsimple-otp" in response.headers:
-                if two_factor_callback == None:
-                    raise Exception(
-                        "This account requires 2FA. A 2FA callback function must be provided"
-                    )
-                else:
-                    # Obtain 2FA code using callback function
-                    MFACode = two_factor_callback()
-                    # Add the 2FA code to the body of the login request
-                    data.append(("otp", MFACode))
-                    # Make a second login request using the 2FA code
-                    response = self.TradeAPI.makeRequest(
-                        "POST", "auth/login", data)
+                if not mfa_code and not two_factor_callback:
+                    return {
+                        "status": 403,
+                        "error": "This account requires 2FA. Provide MFA code or a callback function.",
+                    }
 
+                otp_value = mfa_code or two_factor_callback()
+
+                if not otp_value:
+                    return {"status": 403, "error": "MFA code is required but not provided."}
+
+                data.append(("otp", otp_value))
+                response = self.TradeAPI.makeRequest("POST", "auth/login", data)
+
+            # Check for invalid login
             if response.status_code == 401:
-                raise Exception("Invalid Login")
+                return {"status": 401, "error": "Invalid login credentials."}
+
+            # Raise any other potential HTTP errors
+            response.raise_for_status()
 
             # Update session headers with the API access token
-            self.session.headers.update(
-                {"Authorization": response.headers["X-Access-Token"]}
-            )
-        else:
-            raise Exception("Missing login credentials")
+            self.session.headers.update({"Authorization": response.headers["X-Access-Token"]})
+
+            return {"status": 200, "message": "Wealthsimple Login successful"}
+
+        except HTTPError as http_err:
+            # Handle HTTP errors explicitly
+            return {"status": response.status_code, "error": str(http_err)}
+
+        except Exception as err:
+            # Handle general errors
+            return {"status": 500, "error": str(err)}
 
     def get_accounts(self) -> list:
         """Get Wealthsimple Trade accounts
@@ -147,9 +216,9 @@ class wealthSimple:
 
         callParams = {}
         
-        if not limit is None:
+        if limit is not None:
             callParams["limit"] = limit
-        if not sec_id is None:
+        if sec_id is not None:
             callParams["security_id"] = sec_id
 
         response = self.TradeAPI.makeRequest("GET", "security-groups", params=callParams)
@@ -240,10 +309,22 @@ class wealthSimple:
             callParams["type"] = type
         if not sec_id is None:
             callParams["security_id"] = sec_id
-            
-        response = self.TradeAPI.makeRequest("GET", "account/activities", params=callParams)
-        response = response.json()
-        return response["results"]
+        try:    
+            response = self.TradeAPI.makeRequest("GET", "account/activities", params=callParams)
+            response.raise_for_status()
+            response_data = response.json()
+            print("###Response Data###")
+            print(response_data)
+            return {"status": response.status_code, "data": response_data["results"]}
+        except HTTPError as http_err:
+            print("HTTP ERROR")
+            return {"status": response.status_code, "error": str(http_err)}
+        
+        except Exception as error:
+            print("OBJECT ERROR")
+            print(error)
+            return {"status": 500, "error": str(error)}
+
 
     def get_orders(self, symbol: str = None) -> list:
         """Get Wealthsimple Trade orders

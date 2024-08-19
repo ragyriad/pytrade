@@ -3,7 +3,7 @@ from django.db.models import Q
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from django.core.serializers import serialize
+
 
 from .serializers import BrokerSerializer, ActivitySerializer, AccountSerializer, AccountPositionSerializer, SecuritySerializer, SecurityGroupSerializer, DepositSerializer
 from .models import Broker, Activity, Account, Security,SecurityGroup, AccountPosition, Deposit
@@ -69,14 +69,6 @@ class activityApiView(APIView):
         activitiesToDelete.delete()
         return Response({"action": "Deleted", "data": serializedActivities}, status=status.HTTP_200_OK)
 
-# class positionApiView(APIView):
-#     serializer_class = PositionSerializer
-
-#     def get(self,request):
-#         fetchedPositions = PositionSerializer(Position.objects.all(), many=True).data
-#         count = len(fetchedPositions)
-#         return Response({'count': count,'Positions': fetchedPositions}, status=status.HTTP_200_OK)
-    
 
 class securityApiView(APIView):
     serializer_class = SecuritySerializer

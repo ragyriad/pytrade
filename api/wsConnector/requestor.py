@@ -53,7 +53,6 @@ class   APIRequestor:
         if method == "POST":
             return self.post(URL, params)
         elif method == "GET":
-
             return self.get(URL, params)
         else:
             raise Exception(f"Invalid request method: {method}")
@@ -73,7 +72,7 @@ class   APIRequestor:
         Response : Response
             A requests response object
         """
-
+        
         try:
             return self.session.post(URL, params)
         except Exception as err:

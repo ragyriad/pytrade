@@ -1,4 +1,5 @@
-import LandingPage from "./LandingPage";
+import LandingPage from "./Pages/LandingPage";
+import AuthWrapper from "./Services/AuthWrapper";
 
 import React from "react";
 import { createRoot } from "react-dom/client";
@@ -9,14 +10,13 @@ import { persistStore } from "redux-persist";
 
 const App = () => {
   let persistedStore = persistStore(store);
-
   return (
     <React.StrictMode>
       <Provider store={store}>
         <PersistGate persistor={persistedStore}>
-          <React.Fragment>
+          <AuthWrapper>
             <LandingPage />
-          </React.Fragment>
+          </AuthWrapper>
         </PersistGate>
       </Provider>
     </React.StrictMode>
