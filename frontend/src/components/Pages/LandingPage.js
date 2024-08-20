@@ -23,8 +23,6 @@ const LandingPage = () => {
         return res.json();
       })
       .then((data) => {
-        console.log("ACCOUNTS!");
-        console.log(data);
         const accountData = data.accounts.map((account) => {
           return {
             label: account.type,
@@ -32,6 +30,7 @@ const LandingPage = () => {
           };
         });
         dispatch(setAccounts(accountData));
+        console.log("Store State");
         console.log(store.getState());
       });
   }, []);

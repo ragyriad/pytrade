@@ -55,16 +55,21 @@ def getWSObject (mfaCode=None, refreshToken=None):
         print(error_message)
         raise CustomError(error_message, error_type, error_traceback)
     
-def getToken(request):
+def getRefreshToken(request):
     mfaCode = request.body
     try:
         ws = getWSObject(mfaCode)
         token= ws.session.headers["Authorization"]
+        print("WS TOKEN OBJ")
+        print(token)
         if token:
             fileContent = openFile(yaml_file_path)
             fileContent['refresh_token'] = token
             writeFile(yaml_file_path, fileContent)
-        return JsonResponse({"ws_refresh_token": token}, status=status.HTTP_200_OK)
+            return JsonResponse({"ws_refresh_token": token}, status=status.HTTP_200_OK)
+        else:
+            print("WS OBJ")
+            print(ws.__dict__)
     except CustomError as error:
         responseStatus = status.HTTP_500_INTERNAL_SERVER_ERROR
         error_message = str(error)
