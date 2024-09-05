@@ -56,9 +56,21 @@ const AuthWrapper = ({ children }) => {
         setIsModalOpen(false);
         setTwoFaError(null); // Reset any previous errors
       } catch (error) {
-        console.log("Failed to Fetch Refresh Token");
         console.log(error);
-        setTwoFaError(error.error_message);
+        // Check if the error is a 401 or 400 and open the modal if it is
+        if (error?.status === 401 || error?.status === 400) {
+          console.log(
+            "Failed to Fetch Refresh Token with status:",
+            error.status
+          );
+          setTwoFaError(`${error.data.error_message}! Please try again.`);
+          setIsModalOpen(true); // Open the modal for user to enter MFA code again
+        } else {
+          console.log("Unexpected error:", error);
+          setTwoFaError(
+            "An unexpected error occurred. Please try again later."
+          );
+        }
       }
     }
   };

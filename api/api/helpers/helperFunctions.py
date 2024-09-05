@@ -1,6 +1,7 @@
-from .helperData import WSIMPLE_ACTIVITY_TYPE_DICT
+from ..data.constants import WSIMPLE_ACTIVITY_TYPE_DICT
 from .helpers import getActivityAction, setActivityAmountValue, setActivityPrice, setActivityCurrency
 from ...models import Activity, Security
+
 def clean_fetch_activities_data(activities):
     activitiesObjList = []
     securitiesObjList = []

@@ -9,6 +9,7 @@ frontend/migrations/
 __pycache__/
 jsonData/
 db.sqlite3
+/.vscode/*
 /*.sqbpro
 /scripts/*
 # Byte-compiled / optimized / DLL files
