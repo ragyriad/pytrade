@@ -3,7 +3,7 @@ import { authApi } from "../rtkquery/auth";
 
 const initialState = {
   csrfToken: null,
-  wsRefreshToken: null,
+  wealthsimple: null,
 };
 
 const authSlice = createSlice({
@@ -13,8 +13,8 @@ const authSlice = createSlice({
     setCsrfToken(state, action) {
       state.csrfToken = action.payload;
     },
-    setWsRefreshToken(state, action) {
-      state.wsRefreshToken = action.payload;
+    setAuthWealthsimple(state, action) {
+      state.wealthsimple = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -26,13 +26,15 @@ const authSlice = createSlice({
         }
       )
       .addMatcher(
-        authApi.endpoints.getWsRefreshToken.matchFulfilled,
+        authApi.endpoints.getAuthWealthsimple.matchFulfilled,
         (state, action) => {
-          state.wsRefreshToken = action.payload.refreshToken;
+          console.log("get WS AUTH Payload");
+          console.log(action.payload);
+          state.wealthsimple = action.payload;
         }
       );
   },
 });
 
-export const { setCsrfToken, setWsRefreshToken } = authSlice.actions;
+export const { setCsrfToken, setAuthWealthsimple } = authSlice.actions;
 export const { reducer: authReducer } = authSlice;

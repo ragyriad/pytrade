@@ -72,23 +72,24 @@ def handle_errors(view_func):
     return _wrapped_view
 
 
-def getWsConnection(mfaCode=None):
-    del_instance_cache('ws_instance')
-    ws_instance = get_instance_cache()
-    if ws_instance is None:
+def getWsConnection(sessionId=None, mfaCode=None):
+    f"MFA CODE -> {mfaCode}"
+    instance = get_instance_cache(sessionId)
+    if instance is None:
         wsimpleFile = openFile(yaml_file_path)
         email = wsimpleFile['email']
         password = wsimpleFile['password']
         new_instance = wealthSimple(email=email, password=password, mfa_code=mfaCode)
         expiry_datetime = new_instance.box.access_expires
+        session_id = new_instance.box.access_token
         print(f"expiry date {expiry_datetime}")
         del new_instance.logger
         print("New Instance WS Connection")
         print(new_instance.__dict__)
-        set_instance_cache(new_instance,expiry_datetime)
+        set_instance_cache(session_id,new_instance,expiry_datetime)
         return new_instance
     else:
-        return ws_instance
+        return instance
 
 @handle_errors 
 def login(request):
@@ -96,15 +97,13 @@ def login(request):
     
     mfaCode = int(request.body)
     print(mfaCode)
-    ws_instance = getWsConnection(mfaCode)
+    ws_instance = getWsConnection(None,mfaCode)
     print("login completed wsimple.py")
     refresh_token = ws_instance.box.refresh_token
+    access_token = ws_instance.box.access_token
     access_expiry = ws_instance.box.access_expires
-    if refresh_token:
-        fileContent = openFile(yaml_file_path)
-        fileContent['refresh_token'] = refresh_token
-        writeFile(yaml_file_path, fileContent)
-        return JsonResponse({"access_expiry": access_expiry, "ws_refresh_token": refresh_token}, status=status.HTTP_200_OK)
+    if refresh_token and access_token and access_expiry:
+        return JsonResponse({"access_expiry": access_expiry, "access_token": access_token,"ws_refresh_token": refresh_token}, status=status.HTTP_200_OK)
     else:
         return JsonResponse({"error": LoginError}, status=status.HTTP_401_UNAUTHORIZED)
 

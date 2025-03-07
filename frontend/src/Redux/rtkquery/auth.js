@@ -1,23 +1,24 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-
-const host = window.location.origin;
+import { API_URLS } from "../../config.js";
 
 // Define our single API slice object
 export const authApi = createApi({
   reducerPath: "authApi",
-  baseQuery: fetchBaseQuery({ baseUrl: host + "/api/wealthsimple" }),
+  baseQuery: fetchBaseQuery({
+    baseUrl: API_URLS.PROD_BASE,
+  }),
   // The "endpoints" represent operations and requests for this server
   endpoints: (builder) => ({
     getCsrfToken: builder.query({
-      query: () => "/auth/csrf",
+      query: () => API_URLS.CSRF,
     }),
-    getWsRefreshToken: builder.query({
+    getAuthWealthsimple: builder.mutation({
       query: (args) => {
         return {
-          url: "/auth",
+          url: API_URLS.WS + API_URLS.AUTH,
           method: "POST",
           headers: {
-            "Content-type": "appliation/json",
+            "Content-type": "application/json",
             "X-CSRFToken": args.csrfToken,
             mode: "same-origin",
           },
@@ -29,4 +30,4 @@ export const authApi = createApi({
 });
 
 // Export the auto-generated hook for the `getPosts` query endpoint
-export const { useGetCsrfTokenQuery, useLazyGetWsRefreshTokenQuery } = authApi;
+export const { useGetCsrfTokenQuery, useGetAuthWealthsimpleMutation } = authApi;

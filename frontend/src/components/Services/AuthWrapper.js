@@ -2,12 +2,16 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   useGetCsrfTokenQuery,
-  useLazyGetWsRefreshTokenQuery,
+  useGetAuthWealthsimpleMutation,
 } from "../../Redux/rtkquery/auth";
-import { setCsrfToken, setWsRefreshToken } from "../../Redux/slices/authSlice";
+import {
+  setCsrfToken,
+  setAuthWealthsimple,
+} from "../../Redux/slices/authSlice";
 import WealthsimpleAuthModal from "../Modals/WealthsimpleAuthModal";
+import LandingPage from "../Pages/LandingPage";
 
-const AuthWrapper = ({ children }) => {
+const AuthWrapper = () => {
   const dispatch = useDispatch();
   const csrfToken = useSelector((state) => state.auth.csrfToken);
   const wsRefreshToken = useSelector((state) => state.auth.wsRefreshToken);
@@ -20,13 +24,14 @@ const AuthWrapper = ({ children }) => {
     error: csrfError,
   } = useGetCsrfTokenQuery();
 
-  const [
-    fetchRefreshToken,
-    { isLoading: isRefreshLoading, error: refreshError },
-  ] = useLazyGetWsRefreshTokenQuery();
+  const [authWealthsimple, { isLoading: isAuthLoading, error: refreshError }] =
+    useGetAuthWealthsimpleMutation();
 
   useEffect(() => {
     const fetchTokens = async () => {
+      if (authWealthsimple) {
+        console.log(authWealthsimple);
+      }
       if (csrfTokenData && !csrfToken) {
         const csrfToken = csrfTokenData.csrf_token;
         dispatch(setCsrfToken(csrfToken));
@@ -37,22 +42,24 @@ const AuthWrapper = ({ children }) => {
     if (csrfTokenData && !csrfToken) {
       fetchTokens();
     }
-  }, [csrfTokenData, csrfToken, wsRefreshToken, fetchRefreshToken, dispatch]);
+  }, [csrfTokenData, csrfToken, wsRefreshToken, authWealthsimple, dispatch]);
 
   const handleModalClose = () => {
     setIsModalOpen(false);
     setTwoFaError(null); // Reset the error state when the modal closes
   };
 
-  const handleTwoFaSubmit = async (twoFaCode) => {
+  const handleAuthSubmit = async (twoFaCode) => {
     if (csrfToken) {
       try {
-        const result = await fetchRefreshToken({
+        const result = await authWealthsimple({
           csrfToken,
           twoFaCode,
         }).unwrap();
-        const wsRefreshToken = result.ws_refresh_token;
-        dispatch(setWsRefreshToken(wsRefreshToken));
+        const wsAuth = result;
+        console.log("WS AUTH");
+        console.log(wsAuth);
+        dispatch(setAuthWealthsimple(wsAuth));
         setIsModalOpen(false);
         setTwoFaError(null); // Reset any previous errors
       } catch (error) {
@@ -84,10 +91,17 @@ const AuthWrapper = ({ children }) => {
       <WealthsimpleAuthModal
         open={isModalOpen}
         handleClose={handleModalClose}
-        handleSubmit={handleTwoFaSubmit}
+        handleAuthSubmit={handleAuthSubmit}
         errorMessage={twoFaError} // Pass the error message to the modal
       />
-      {csrfToken && wsRefreshToken ? children : <div></div>}
+      {console.log(
+        `crsf => ${csrfToken} \n wsRefreshToken => ${wsRefreshToken}`
+      )}
+      {csrfToken && wsRefreshToken ? (
+        <LandingPage handleAuthSubmit={handleAuthSubmit} />
+      ) : (
+        <div />
+      )}
     </>
   );
 };

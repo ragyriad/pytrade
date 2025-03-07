@@ -15,7 +15,7 @@ urlpatterns = [
     path('wealthsimple/deposit', syncDeposits),
     path('wealthsimple/securitygroup', syncSecurityGroups),
     path('wealthsimple/auth', login),
-    path('wealthsimple/auth/csrf', fetchCSRFToken),
+    path('csrf', fetchCSRFToken),
     path('broker', brokerApiView.as_view()),
     path('security', securityApiView.as_view()),
     path('securitygroup', securityGroupApiView.as_view()),

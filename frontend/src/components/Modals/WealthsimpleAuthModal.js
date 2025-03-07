@@ -4,20 +4,13 @@ import { Modal, Box, Typography, TextField, Button } from "@mui/material";
 const WealthsimpleAuthModal = ({
   open,
   handleClose,
-  handleSubmit,
+  handleAuthSubmit,
   errorMessage,
 }) => {
-  const [authCode, setAuthCode] = useState("");
+  const [otp, setOtp] = useState("");
 
-  const handleAuthCodeChange = (event) => {
-    setAuthCode(event.target.value);
-  };
-
-  const onSubmit = () => {
-    handleSubmit(authCode);
-    console.log("Auth Code on Submit");
-    console.log(authCode);
-    handleClose(); // Close the modal on submit
+  const handleOtpChange = (event) => {
+    setOtp(event.target.value);
   };
 
   return (
@@ -47,10 +40,17 @@ const WealthsimpleAuthModal = ({
           variant="outlined"
           fullWidth
           margin="normal"
-          value={authCode}
-          onChange={handleAuthCodeChange}
+          value={otp}
+          onChange={handleOtpChange}
         />
-        <Button variant="contained" color="primary" onClick={onSubmit}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => {
+            handleAuthSubmit(otp);
+            handleClose();
+          }}
+        >
           Submit
         </Button>
       </Box>

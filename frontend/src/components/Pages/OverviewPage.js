@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Card from "@mui/material/Card";
 import { useSelector } from "react-redux";
-
+import { API_URLS } from "../../config";
 import { Grid } from "@mui/material";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
@@ -11,11 +11,13 @@ const OverviewPage = () => {
   const [totalDividends, setTotalDividends] = useState(0);
   const [tradesCount, setTradesCount] = useState(0);
   const accountFilter = useSelector((state) => state.accountFilter.value);
+
   useEffect(() => {
+    const pageURL = API_URLS.PROD_BASE + API_URLS.OVERVIEW;
     Promise.all([
-      fetch("api/overview/commission"),
-      // fetch("api/overview/dividends"),
-      fetch("api/overview/trades"),
+      fetch(`${pageURL + API_URLS.COM}`),
+      fetch(`${pageURL + API_URLS.DIV}`),
+      fetch(`${pageURL + API_URLS.TRADES}`),
     ])
       .then(async ([comission, dividends, trades]) => {
         const commissionData = await comission.json();

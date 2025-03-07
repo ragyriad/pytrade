@@ -11,14 +11,14 @@ import store from "../../Redux/store";
 import React, { Fragment, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { AppBar, Toolbar, Typography, Tabs, Tab, Box } from "@mui/material";
-
+import { API_URLS } from "../../config";
 const LandingPage = () => {
   const dispatch = useDispatch();
 
   const tab = useSelector((state) => state.tab.value);
 
   useEffect(() => {
-    fetch("api/account")
+    fetch(API_URLS.PROD_BASE + API_URLS.ACC)
       .then((res) => {
         return res.json();
       })
@@ -73,19 +73,13 @@ const LandingPage = () => {
           </Toolbar>
         </AppBar>
         <CustomTabPanel value={tab} index={0}>
-          <AuthWrapper>
-            <OverviewPage />
-          </AuthWrapper>
+          <OverviewPage />
         </CustomTabPanel>
         <CustomTabPanel value={tab} index={1}>
-          <AuthWrapper>
-            <ActivityPage />
-          </AuthWrapper>
+          <ActivityPage />
         </CustomTabPanel>
         <CustomTabPanel value={tab} index={2}>
-          <AuthWrapper>
-            <UpdatePage />
-          </AuthWrapper>
+          <UpdatePage />
         </CustomTabPanel>
         <CustomTabPanel value={tab} index={3}>
           Positions
